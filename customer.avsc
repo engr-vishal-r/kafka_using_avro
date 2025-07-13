@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "customer",
+  "fields": [
+    {"name": "customer_name", "type": "string"},
+    {"name": "card_number", "type": "long"},
+    {"name": "mobile_no", "type": "long"},
+    {"name": "address_line1", "type": "string"},
+    {"name": "address_line2", "type": ["null", "string"], "default": null},
+    {"name": "area", "type": "int"},
+    {
+      "name": "defaulter",
+      "type": {
+        "type": "enum",
+        "name": "DefaulterStatus",
+        "symbols": ["Y", "N"]
+      }
+    },
+    {"name": "pending_amount", "type": "double"},
+    {"name": "status", "type": "string"},
+    {"name": "enrolled_date", "type": ["null", "string"], "default": null},
+    {"name": "updated_date", "type": ["null", "string"], "default": null},
+    {"name": "billing_frequency", "type": "string"}
+  ]
+}
