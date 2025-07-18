@@ -9,6 +9,7 @@ import io
 import json
 from dotenv import load_dotenv
 from pandas import Timestamp
+from password_utils import decrypt_password
 
 load_dotenv() 
 config = {'bootstrap.servers': os.getenv("KAFKA_BOOTSTRAP_SERVERS")}
@@ -22,18 +23,21 @@ def delivery_report(err, msg):
 
 def serialize_avro(data,schema):
     bytes_writer=io.BytesIO()
-    encoder = avro.io.BinaryEncoder(bytes_writer)
+    encoder =avro.io.BinaryEncoder(bytes_writer)
     writer=avro.io.DatumWriter(schema)
     writer.write(data, encoder)
     return bytes_writer.getvalue()
     
 
 def fetch_data_from_mysql():
+    encrypted_password = os.getenv("ENCRYPTED_PASSWORD")
+    decrypted = decrypt_password(encrypted_password.encode())
+
     mysql_config = {
         'host': os.getenv("MYSQL_HOST"),
         'port': int(os.getenv("MYSQL_PORT")),
         'user': os.getenv("MYSQL_USER"),
-        'password': os.getenv("MYSQL_PASSWORD"),
+        'password': decrypted,
         'database': os.getenv("MYSQL_DB")
     }
 
@@ -73,7 +77,7 @@ def clean_avro_record(record):
     }
 
 def write_data_to_file(df):
-    output_dir = 'F:/E2E_Projects/extract'
+    output_dir = 'F:/E2E_Projects/kafka_using_avro/extract'
     os.makedirs(output_dir, exist_ok=True)
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     file_name = f'etl_output_{timestamp}.csv'
